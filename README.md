@@ -13,7 +13,10 @@ $ cp .env.example .env
 
 3. Provide a schema for the output, and pass in a list of companies. 
 
-4. Run the graph! 
+4. Run the graph!
+
+![Screenshot 2024-11-26 at 2 33 07 PM](https://github.com/user-attachments/assets/7b52ac0a-fe4a-414c-8936-9a2d8abaea46)
+
 
 ## Overview
 
@@ -23,10 +26,14 @@ $ cp .env.example .env
    - **Research Phase**: The system parallelizes web research across all companies in parallel:
      - Uses [Tavily API](https://tavily.com/) for targeted web searches, performing up to `max_search_queries` queries per company.
      - Performs web searches for each company in parallel and returns up to `max_search_results` results per query.
-    - **Extract Schema**: After research is complete, the system uses an LLM to extract the information from the research in the user-defined schema.
+   - **Extract Schema**: After research is complete, the system uses an LLM to extract the information from the research in the user-defined schema.
 
 ## Configuration
 
 The configuration for Company mAIstro is defined in the `configuration.py` file: 
 * `max_search_queries`: int = 3 # Max search queries per company
 * `max_search_results`: int = 3 # Max search results per query
+
+These can be added in Studio:
+
+![Screenshot 2024-11-26 at 2 33 14 PM](https://github.com/user-attachments/assets/305cf2ad-a664-4cb6-99e5-e86bd024b065)
