@@ -48,41 +48,36 @@ The user inputs are:
 * user_notes: Optional[str] - Any additional notes about the companies from the user
 ```
 
-Here is an example schema that can be supplied: 
+Here is an example schema that can be supplied to research a single company:  
 
 ```
 {
-    "title": "companies_info",
-    "description": "Information about multiple companies",
-    "type": "array",
-    "items": {
-        "type": "object",
-        "properties": {
-            "company_name": {
-                "type": "string",
-                "description": "Official name of the company"
-            },
-            "founding": {
-                "type": "object",
-                "properties": {
-                    "year": {"type": "integer"},
-                    "founders": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "Names of the founding team members"
-                    }
-                }
-            },
-            "product_info": {
-                "type": "string",
-                "description": "Information about the company's product"
-            },
-            "funding_info": {
-                "type": "string",
-                "description": "Information about the company's funding to date"
-            }
+    "title": "CompanyInfo",
+    "description": "Basic information about a company",
+    "type": "object",
+    "properties": {
+        "company_name": {
+            "type": "string",
+            "description": "Official name of the company"
         },
-        "required": ["company_name"]
-    }
+        "founding_year": {
+            "type": "integer",
+            "description": "Year the company was founded"
+        },
+        "founder_names": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Names of the founding team members"
+        },
+        "product_description": {
+            "type": "string",
+            "description": "Brief description of the company's main product or service"
+        },
+        "funding_summary": {
+            "type": "string",
+            "description": "Summary of the company's funding history"
+        }
+    },
+    "required": ["company_name"]
 }
 ```

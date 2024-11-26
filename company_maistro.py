@@ -160,7 +160,7 @@ class Queries(BaseModel):
 @dataclass(kw_only=True)
 class InputState:
     """Input state defines the interface between the graph and the user (external API)."""
-    companies: str
+    companies: list[str]
     "List of company names to research."
 
     extraction_schema: dict[str, Any]
@@ -172,7 +172,7 @@ class InputState:
 @dataclass(kw_only=True)
 class OverallResearchState:
     """Input state defines the interface between the graph and the user (external API)."""
-    companies: str
+    companies: list[str]
     "Company names to research provided by the user."
 
     extraction_schema: dict[str, Any]
@@ -241,7 +241,7 @@ company_extraction_instructions = """
     Return the companies in a structured format that matches the CompanyList schema.
 """
 
-extraction_prompt = """ Your task is to take notes gather from web research
+extraction_prompt = """Your task is to take notes gather from web research
 
 and extract them into the following schema. 
 
@@ -312,7 +312,7 @@ def plan_companies_to_research(state: OverallResearchState):
     structured_llm = claude_3_5_sonnet.with_structured_output(CompanyList)
 
     # Generate queries  
-    company_list = structured_llm.invoke([SystemMessage(content=company_extraction_instructions)]+[HumanMessage(content=f"Extract a list of companies to research based on this input: {state.companies}")])
+    company_list = structured_llm.invoke([SystemMessage(content=company_extraction_instructions)]+[HumanMessage(content=f"Extract a list of companies to research based on this input: {str(state.companies)}")])
     return {"company_list": company_list.companies}
 
 async def research_company(state: CompanyResearchState, config: RunnableConfig) -> str:
@@ -392,7 +392,7 @@ def gather_notes_extract_schema(state: OverallResearchState) -> dict[str, Any]:
 
     # Extract schema fields
     system_prompt = extraction_prompt.format(info=json.dumps(state.extraction_schema, indent=2), notes=notes) 
-    structured_llm = gpt_4o.with_structured_output(state.extraction_schema)
+    structured_llm = claude_3_5_sonnet.with_structured_output(state.extraction_schema)
     result = structured_llm.invoke([SystemMessage(content=system_prompt), HumanMessage(content=f"Produce a structured output from these notes.")])
     return {"extracted_information": result}
 
