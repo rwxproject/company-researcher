@@ -37,3 +37,52 @@ The configuration for Company mAIstro is defined in the `configuration.py` file:
 These can be added in Studio:
 
 ![Screenshot 2024-11-26 at 2 33 14 PM](https://github.com/user-attachments/assets/305cf2ad-a664-4cb6-99e5-e86bd024b065)
+
+## Inputs 
+
+The user inputs are: 
+
+```
+* companies: List[str] - A list of companies to research
+* schema: str - A JSON schema for the output
+* user_notes: Optional[str] - Any additional notes about the companies from the user
+```
+
+Here is an example schema that can be supplied: 
+
+```
+{
+    "title": "companies_info",
+    "description": "Information about multiple companies",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "company_name": {
+                "type": "string",
+                "description": "Official name of the company"
+            },
+            "founding": {
+                "type": "object",
+                "properties": {
+                    "year": {"type": "integer"},
+                    "founders": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Names of the founding team members"
+                    }
+                }
+            },
+            "product_info": {
+                "type": "string",
+                "description": "Information about the company's product"
+            },
+            "funding_info": {
+                "type": "string",
+                "description": "Information about the company's funding to date"
+            }
+        },
+        "required": ["company_name"]
+    }
+}
+```
