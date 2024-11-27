@@ -198,7 +198,7 @@ class InputState:
     company: str
     "Company to research provided by the user."
 
-    extraction_schema:  dict[str, Any] = field(
+    extraction_schema:  Optional[dict[str, Any]] = field(
         default_factory=lambda: DEFAULT_EXTRACTION_SCHEMA
     )
     "The json schema defines the information the agent is tasked with filling out."
@@ -224,13 +224,6 @@ class OverallState:
 
     completed_notes: Annotated[list, operator.add] = field(default_factory=list)
     "Notes from completed research related to the schema"
-
-    info: dict[str, Any] = field(default=None)
-    """
-    A dictionary containing the extracted and processed information
-    based on the user's query and the graph's execution.
-    This is the primary output of the enrichment process.
-    """
 
 
 @dataclass(kw_only=True)
