@@ -15,7 +15,8 @@ $ cp .env.example .env
 
 4. Run the graph!
 
-![Screenshot 2024-11-26 at 7 58 52 PM](https://github.com/user-attachments/assets/b12857f4-0810-43c2-805c-d85e7a235034)
+![Screenshot 2024-11-26 at 8 14 15 PM](https://github.com/user-attachments/assets/f2a9724b-12a9-41d8-bf1f-21c2217ba400)
+
 
 ## Overview
 
@@ -38,8 +39,7 @@ The configuration for Company mAIstro is defined in the `configuration.py` file:
 
 These can be added in Studio:
 
-![Screenshot 2024-11-26 at 7 56 03 PM](https://github.com/user-attachments/assets/db12c1cf-34bb-4773-86a5-a1e1c3519be9)
-
+![Screenshot 2024-11-26 at 8 14 19 PM](https://github.com/user-attachments/assets/2c102a80-692d-479d-a5a7-edd6506eb42d)
 
 ## Inputs 
 
