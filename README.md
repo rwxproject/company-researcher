@@ -259,22 +259,4 @@ Currently there is a single evaluation metric: fraction of the fields that were 
 
 ### Running evals
 
-To evaluate the Company mAIstro agent, you can run `evals/test_agent.py` script. This will create new experiments in LangSmith for the two [datasets](#datasets) mentioned above.
-
-Basic usage:
-
-```shell
-python evals/test_agent.py
-```
-
-By default the script will also check the results against the minimum acceptable scores. This can be skipped by passing in the `--skip-regression` flag.
-
-```shell
-python evals/test_agent.py --skip-regression
-```
-
-You can also customize additional parameters such as the maximum number of concurrent runs and the experiment prefix.
-
-```shell
-python evals/test_agent.py --max-concurrency 4 --experiment-prefix "My custom prefix"
-```
+Please see instructions on how to run evals [here](https://github.com/langchain-ai/agent-evals/tree/main/company_data_enrichment)
