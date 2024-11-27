@@ -11,6 +11,7 @@ class Configuration:
     """The configurable fields for the chatbot."""
     max_search_queries: int = 3 # Max search queries per company
     max_search_results: int = 3 # Max search results per query
+    max_reflection_steps: int = 1 # Max reflection steps
 
     @classmethod
     def from_runnable_config(
