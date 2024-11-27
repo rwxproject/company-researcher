@@ -1,4 +1,3 @@
-
 import asyncio
 import operator
 import json
@@ -393,6 +392,9 @@ async def research_company(state: OverallState, config: RunnableConfig) -> str:
     max_search_queries = configurable.max_search_queries
     max_search_results = configurable.max_search_results
 
+    # Initialize search client
+    tavily_async_client = AsyncTavilyClient()
+
     # Generate search queries
     structured_llm = claude_3_5_sonnet.with_structured_output(Queries)
 
@@ -421,9 +423,6 @@ async def research_company(state: OverallState, config: RunnableConfig) -> str:
                 )
             ]
         )
-
-        # Search client
-        tavily_async_client = AsyncTavilyClient()
 
         # Queries
         query_list = [query.search_query for query in results.queries]

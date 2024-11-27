@@ -57,9 +57,14 @@ The user inputs are:
 * user_notes: Optional[str] - Any additional notes about the company from the user
 ```
 
-Here is an example schema that can be supplied to research a company:  
+### Schemas  
 
 > ⚠️ **WARNING:** JSON schemas require `title` and `description` fields for [extraction](https://python.langchain.com/docs/how_to/structured_output/#typeddict-or-json-schema).
+> ⚠️ **WARNING:** Avoid JSON objects with nesting; LLMs have challenges performing structured extraction from nested objects. See examples below that we have tested. 
+
+Here is an example schema that can be supplied to research a company:  
+
+* See the trace [here](https://smith.langchain.com/public/9f51fb8b-9486-4cd2-90ed-895f7932304e/r).
 
 ```
 {
@@ -90,5 +95,153 @@ Here is an example schema that can be supplied to research a company:
         }
     },
     "required": ["company_name"]
+}
+```
+
+Here is an example of a more complex schema: 
+
+* See the reflections steps in the trace [here](https://smith.langchain.com/public/f9811aed-1113-44f5-889b-e99a987b655c/r).
+
+```
+HARD_EXTRACTION_SCHEMA = {
+    "title": "CompanyInfo",
+    "description": "Comprehensive information about a company with confidence tracking",
+    "type": "object",
+    "properties": {
+        # Core Company Info
+        "company_name": {
+            "type": "string",
+            "description": "Official name of the company"
+        },
+        "verified_company": {
+            "type": "boolean",
+            "description": "Confirmation this is the intended company, not a similarly named one"
+        },
+        "similar_companies": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of similarly named companies that could be confused with the target"
+        },
+        "distinguishing_features": {
+            "type": "string",
+            "description": "Key features that distinguish this company from similarly named ones"
+        },
+        
+        # Executive Information
+        "key_executives": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "title": {"type": "string"},
+                    "verification_date": {"type": "string"},
+                    "confidence_level": {
+                        "type": "string",
+                        "enum": ["high", "medium", "low", "uncertain"]
+                    },
+                    "source": {"type": "string"}
+                }
+            }
+        },
+        "org_chart_summary": {
+            "type": "string",
+            "description": "Brief description of organizational structure"
+        },
+        "leadership_caveats": {
+            "type": "string",
+            "description": "Any uncertainties or caveats about leadership information"
+        },
+        
+        # Products and Services
+        "main_products": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "description": {"type": "string"},
+                    "launch_date": {"type": "string"},
+                    "current_status": {"type": "string"}
+                }
+            }
+        },
+        "services": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "description": {"type": "string"},
+                    "target_market": {"type": "string"}
+                }
+            }
+        },
+        
+        # News and Updates
+        "recent_developments": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "date": {"type": "string"},
+                    "title": {"type": "string"},
+                    "summary": {"type": "string"},
+                    "source_url": {"type": "string"},
+                    "significance": {"type": "string"}
+                }
+            },
+            "description": "Major news and developments from the last 6 months"
+        },
+        
+        # Historical Issues
+        "historical_challenges": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "issue_type": {"type": "string"},
+                    "description": {"type": "string"},
+                    "date_period": {"type": "string"},
+                    "resolution": {"type": "string"},
+                    "current_status": {"type": "string"}
+                }
+            },
+            "description": "Past challenges, issues, or controversies"
+        },
+        
+        # Sources and Citations
+        "sources": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string"},
+                    "title": {"type": "string"},
+                    "date_accessed": {"type": "string"},
+                    "information_type": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Types of information sourced from this link (e.g., leadership, products, news)"
+                    }
+                }
+            }
+        },
+        
+        # Executive Summary
+        "company_summary": {
+            "type": "string",
+            "description": "Concise, dense summary of the most important company information (max 250 words)"
+        },
+    },
+    "required": [
+        "company_name",
+        "verified_company",
+        "company_summary",
+        "key_executives",
+        "main_products",
+        "sources",
+        "completeness_score"
+    ]
 }
 ```
