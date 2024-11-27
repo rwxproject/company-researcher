@@ -15,6 +15,8 @@ $ cp .env.example .env
 
 4. Run the graph!
 
+![Screenshot 2024-11-26 at 7 58 52 PM](https://github.com/user-attachments/assets/b12857f4-0810-43c2-805c-d85e7a235034)
+
 ## Overview
 
 Company mAIstro follows a multi-step research and extraction workflow that separates web research from schema extraction, allowing for better resource management and comprehensive data collection:
@@ -35,6 +37,9 @@ The configuration for Company mAIstro is defined in the `configuration.py` file:
 * `max_search_results`: int = 3 # Max search results per query
 
 These can be added in Studio:
+
+![Screenshot 2024-11-26 at 7 56 03 PM](https://github.com/user-attachments/assets/db12c1cf-34bb-4773-86a5-a1e1c3519be9)
+
 
 ## Inputs 
 
