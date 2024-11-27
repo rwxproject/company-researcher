@@ -164,7 +164,9 @@ def run_evals(max_concurrency: int = 2, check_regression: bool = True):
             error_msg += f"Public company score {public_company_score} is less than {MIN_PUBLIC_COMPANY_SCORE}\n"
 
         if startup_score < MIN_STARTUP_SCORE:
-            error_msg += f"Startup score {startup_score} is less than {MIN_STARTUP_SCORE}\n"
+            error_msg += (
+                f"Startup score {startup_score} is less than {MIN_STARTUP_SCORE}\n"
+            )
 
         if error_msg:
             raise AssertionError(error_msg)
