@@ -86,3 +86,41 @@ Here is an example schema that can be supplied to research a company:
     "required": ["company_name"]
 }
 ```
+
+## Evaluation
+
+### Datasets
+
+- [Public companies](https://smith.langchain.com/public/bb139cd5-c656-4323-9bea-84cb7bf6080a/d)
+- [Startups](https://smith.langchain.com/public/2b0a2f35-9d7c-40f2-a24f-5dec877dec1e/d)
+
+### Metric
+
+Currently there is a single evaluation metric: fraction of the fields that were correctly extracted (per company). Correctness is defined differently depending on the field type:
+
+- exact matches for fields like `founding_year` / `website`
+- fuzzy matches for fields like `company_name` / `ceo`
+- embedding similarity for fields like `description`
+- checking within a certain tolerance (+/- 10%) for fields like `employee_count` / `total_funding_mm_usd`
+
+### Running evals
+
+To evaluate the Company mAIstro agent, you can run `evals/test_agent.py` script. This will create new experiments in LangSmith for the two [datasets](#datasets) mentioned above.
+
+Basic usage:
+
+```shell
+python evals/test_agent.py
+```
+
+By default the script will also check the results against the minimum acceptable scores. This can be skipped by passing in the `--skip-regression` flag.
+
+```shell
+python evals/test_agent.py --skip-regression
+```
+
+You can also customize additional parameters such as the maximum number of concurrent runs and the experiment prefix.
+
+```shell
+python evals/test_agent.py --max-concurrency 4 --experiment-prefix "My custom prefix"
+```

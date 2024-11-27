@@ -134,19 +134,24 @@ MIN_PUBLIC_COMPANY_SCORE = 0.9
 MIN_STARTUP_SCORE = 0.7
 
 
-def run_evals(max_concurrency: int = 2, check_regression: bool = True):
+def run_evals(
+    *,
+    max_concurrency: int = 2,
+    check_regression: bool = True,
+    experiment_prefix=EXPERIMENT_PREFIX,
+):
     public_company_eval_results = evaluate(
         run_agent,
         data=public_companies_dataset,
         evaluators=[evaluate_agent],
-        experiment_prefix=EXPERIMENT_PREFIX,
+        experiment_prefix=experiment_prefix,
         max_concurrency=max_concurrency,
     )
     startup_eval_results = evaluate(
         run_agent,
         data=startup_dataset,
         evaluators=[evaluate_agent],
-        experiment_prefix=EXPERIMENT_PREFIX,
+        experiment_prefix=experiment_prefix,
         max_concurrency=max_concurrency,
     )
 
@@ -187,8 +192,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--skip-regression", action="store_true", help="Skip regression checks"
     )
+    parser.add_argument(
+        "--experiment-prefix",
+        type=str,
+        default=EXPERIMENT_PREFIX,
+        help="Experiment prefix for the evaluation",
+    )
     args = parser.parse_args()
 
     run_evals(
-        max_concurrency=args.max_concurrency, check_regression=not args.skip_regression
+        max_concurrency=args.max_concurrency,
+        check_regression=not args.skip_regression,
+        experiment_prefix=args.experiment_prefix,
     )
