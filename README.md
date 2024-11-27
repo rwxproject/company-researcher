@@ -48,6 +48,8 @@ The user inputs are:
 
 Here is an example schema that can be supplied to research a company:  
 
+> ⚠️ **WARNING:** JSON schemas require `title` and `description` fields for [extraction](https://python.langchain.com/docs/how_to/structured_output/#typeddict-or-json-schema). Otherwise, you may see errors as shown [here](https://smith.langchain.com/public/341dba26-cff8-447b-b940-9f097d43bfa2/r).
+
 ```
 {
     "title": "CompanyInfo",
