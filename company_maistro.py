@@ -5,9 +5,9 @@ import json
 from tavily import TavilyClient, AsyncTavilyClient
 
 from langchain_anthropic import ChatAnthropic
-from langchain_openai import ChatOpenAI
 
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.runnables import RunnableConfig
 from langsmith import traceable
 
@@ -22,8 +22,13 @@ import configuration
 
 # -----------------------------------------------------------------------------
 # LLMs
-gpt_4o = ChatOpenAI(model="gpt-4o", temperature=0)
-claude_3_5_sonnet = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0)
+
+rate_limiter = InMemoryRateLimiter(
+    requests_per_second=4,
+    check_every_n_seconds=0.1,
+    max_bucket_size=10,  # Controls the maximum burst size.
+)
+claude_3_5_sonnet = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0, rate_limiter=rate_limiter)
 
 # -----------------------------------------------------------------------------
 # Search
