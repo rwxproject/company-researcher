@@ -13,9 +13,12 @@ $ cp .env.example .env
 
 3. Provide a schema for the output, and pass in a company name. 
 
-4. Run the graph!
+4. Run the graph just inputting a `company` name.
 
-![Screenshot 2024-11-26 at 8 14 15 PM](https://github.com/user-attachments/assets/f2a9724b-12a9-41d8-bf1f-21c2217ba400)
+* A schema (see below for details) is optional. It will use a default schema defined [here](https://github.com/langchain-ai/company_mAIstro/blob/main/company_maistro.py#L163) if none is provided.
+* Additional user notes about the company can be provided as a text field, and will be included in the research process. 
+
+<img width="1624" alt="Screenshot 2024-11-27 at 9 29 15 AM" src="https://github.com/user-attachments/assets/176f9959-504e-4f05-9381-bf72d526714c">
 
 ## Overview
 
@@ -44,7 +47,7 @@ The configuration for Company mAIstro is defined in the `configuration.py` file:
 
 These can be added in Studio:
 
-![Screenshot 2024-11-26 at 8 14 19 PM](https://github.com/user-attachments/assets/2c102a80-692d-479d-a5a7-edd6506eb42d)
+<img width="1624" alt="Screenshot 2024-11-27 at 9 27 41 AM" src="https://github.com/user-attachments/assets/72908cf9-7779-4aaf-af60-46ca44db82b4">
 
 ## Inputs 
 
