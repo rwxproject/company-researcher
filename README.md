@@ -17,7 +17,6 @@ $ cp .env.example .env
 
 ![Screenshot 2024-11-26 at 8 14 15 PM](https://github.com/user-attachments/assets/f2a9724b-12a9-41d8-bf1f-21c2217ba400)
 
-
 ## Overview
 
 Company mAIstro follows a multi-step research and extraction workflow that separates web research from schema extraction, allowing for better resource management and comprehensive data collection:
@@ -233,6 +232,13 @@ HARD_EXTRACTION_SCHEMA = {
 ```
 
 ## Evaluation
+
+### Setup 
+
+Ensure you have the requirements installed in your environment:
+```
+pip install -r requirements.txt
+```
 
 ### Datasets
 
