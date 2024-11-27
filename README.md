@@ -100,7 +100,7 @@ Here is an example schema that can be supplied to research a company:
 
 Here is an example of a more complex schema: 
 
-* See the reflections steps in the trace [here](https://smith.langchain.com/public/f9811aed-1113-44f5-889b-e99a987b655c/r).
+* See the reflections steps in the trace [here](https://smith.langchain.com/public/36f0d917-4edd-4d55-8dbf-6d6ec8a25754/r).
 
 ```
 HARD_EXTRACTION_SCHEMA = {
@@ -108,7 +108,6 @@ HARD_EXTRACTION_SCHEMA = {
     "description": "Comprehensive information about a company with confidence tracking",
     "type": "object",
     "properties": {
-        # Core Company Info
         "company_name": {
             "type": "string",
             "description": "Official name of the company"
@@ -126,8 +125,6 @@ HARD_EXTRACTION_SCHEMA = {
             "type": "string",
             "description": "Key features that distinguish this company from similarly named ones"
         },
-        
-        # Executive Information
         "key_executives": {
             "type": "array",
             "items": {
@@ -152,8 +149,6 @@ HARD_EXTRACTION_SCHEMA = {
             "type": "string",
             "description": "Any uncertainties or caveats about leadership information"
         },
-        
-        # Products and Services
         "main_products": {
             "type": "array",
             "items": {
@@ -177,8 +172,6 @@ HARD_EXTRACTION_SCHEMA = {
                 }
             }
         },
-        
-        # News and Updates
         "recent_developments": {
             "type": "array",
             "items": {
@@ -193,8 +186,6 @@ HARD_EXTRACTION_SCHEMA = {
             },
             "description": "Major news and developments from the last 6 months"
         },
-        
-        # Historical Issues
         "historical_challenges": {
             "type": "array",
             "items": {
@@ -209,8 +200,6 @@ HARD_EXTRACTION_SCHEMA = {
             },
             "description": "Past challenges, issues, or controversies"
         },
-        
-        # Sources and Citations
         "sources": {
             "type": "array",
             "items": {
@@ -227,12 +216,10 @@ HARD_EXTRACTION_SCHEMA = {
                 }
             }
         },
-        
-        # Executive Summary
         "company_summary": {
             "type": "string",
             "description": "Concise, dense summary of the most important company information (max 250 words)"
-        },
+        }
     },
     "required": [
         "company_name",
@@ -240,8 +227,7 @@ HARD_EXTRACTION_SCHEMA = {
         "company_summary",
         "key_executives",
         "main_products",
-        "sources",
-        "completeness_score"
+        "sources"
     ]
 }
 ```
