@@ -142,7 +142,7 @@ def format_all_notes(completed_notes: list[str]) -> str:
     for idx, company_notes in enumerate(completed_notes, 1):
         formatted_str += f"""
 {'='*60}
-Company {idx}:
+Note: {idx}:
 {'='*60}
 Notes from research:
 {company_notes}"""
@@ -396,15 +396,14 @@ async def research_company(state: OverallState, config: RunnableConfig) -> str:
     # Generate search queries
     structured_llm = claude_3_5_sonnet.with_structured_output(Queries)
 
-    # Check reflection output
-
     # Check reflection output - access attribute directly
     reflection_output = getattr(state, "is_satisfactory", None)
+    reflection_queries = getattr(state, "reflection_search_queries", None)
     
     # If we have performed reflection and have new search queries 
-    if reflection_output:
+    if reflection_output is not None and reflection_queries:
         # Get generated search queries
-        query_list = state.reflection_search_queries
+        query_list = reflection_queries
     else:
         # Format system instructions
         query_instructions = query_writer_instructions.format(
