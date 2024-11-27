@@ -289,6 +289,10 @@ Generate at most {max_search_queries} search queries that will help gather the f
 {info}
 </schema>
 
+<User notes>
+{user_notes}
+</User notes>
+
 Your query should:
 1. Focus on finding factual, up-to-date company information
 2. Target official sources, news, and reliable business databases
@@ -416,6 +420,7 @@ async def research_company(state: OverallState, config: RunnableConfig) -> str:
         query_instructions = query_writer_instructions.format(
             company=state.company,
             info=json.dumps(state.extraction_schema, indent=2),
+            user_notes=state.user_notes,
             max_search_queries=max_search_queries,
         )
 
