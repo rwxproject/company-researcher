@@ -30,12 +30,18 @@ Company mAIstro follows a multi-step research and extraction workflow that separ
      - Consolidates all research notes
      - Uses an LLM to extract and format the information according to the user-defined schema
      - Returns the structured data in the exact format requested
+   - **Reflection Phase**: The system evaluates the quality of extracted information:
+     - Analyzes completeness of required fields
+     - Identifies any missing or incomplete information
+     - Generates targeted follow-up search queries if needed
+     - Continues research until information is satisfactory or max reflection steps reached
 
 ## Configuration
 
 The configuration for Company mAIstro is defined in the `configuration.py` file: 
 * `max_search_queries`: int = 3 # Max search queries per company
 * `max_search_results`: int = 3 # Max search results per query
+* `max_reflection_steps`: int = 1 # Max reflection steps
 
 These can be added in Studio:
 
@@ -53,7 +59,7 @@ The user inputs are:
 
 Here is an example schema that can be supplied to research a company:  
 
-> ⚠️ **WARNING:** JSON schemas require `title` and `description` fields for [extraction](https://python.langchain.com/docs/how_to/structured_output/#typeddict-or-json-schema). Otherwise, you may see errors as shown [here](https://smith.langchain.com/public/341dba26-cff8-447b-b940-9f097d43bfa2/r).
+> ⚠️ **WARNING:** JSON schemas require `title` and `description` fields for [extraction](https://python.langchain.com/docs/how_to/structured_output/#typeddict-or-json-schema).
 
 ```
 {
