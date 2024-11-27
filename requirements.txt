@@ -8,3 +8,4 @@ notebook
 tavily-python
 langgraph-cli
 langchain_anthropic
+levenshtein
