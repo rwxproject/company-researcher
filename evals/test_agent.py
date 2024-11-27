@@ -175,4 +175,20 @@ def run_evals(max_concurrency: int = 2, check_regression: bool = True):
 
 
 if __name__ == "__main__":
-    run_evals()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--max-concurrency",
+        type=int,
+        default=2,
+        help="Maximum number of concurrent runs during evaluation",
+    )
+    parser.add_argument(
+        "--skip-regression", action="store_true", help="Skip regression checks"
+    )
+    args = parser.parse_args()
+
+    run_evals(
+        max_concurrency=args.max_concurrency, check_regression=not args.skip_regression
+    )
