@@ -261,4 +261,4 @@ Currently there is a single evaluation metric: fraction of the fields that were 
 
 ### Running evals
 
-Please see instructions on how to run evals [here](https://github.com/langchain-ai/agent-evals/tree/main/company_data_enrichment)
+Please see instructions on how to run evals [here](https://github.com/langchain-ai/agent-evals/tree/main/public_company_data_enrichment)
