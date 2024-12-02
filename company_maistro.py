@@ -9,7 +9,6 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.runnables import RunnableConfig
-from langsmith import traceable
 
 from langgraph.graph import START, END, StateGraph
 
