@@ -238,27 +238,4 @@ HARD_EXTRACTION_SCHEMA = {
 
 ## Evaluation
 
-### Setup 
-
-Ensure you have the requirements installed in your environment:
-```
-pip install -r requirements.txt
-```
-
-### Datasets
-
-- [Public companies](https://smith.langchain.com/public/bb139cd5-c656-4323-9bea-84cb7bf6080a/d)
-- [Startups](https://smith.langchain.com/public/2b0a2f35-9d7c-40f2-a24f-5dec877dec1e/d)
-
-### Metric
-
-Currently there is a single evaluation metric: fraction of the fields that were correctly extracted (per company). Correctness is defined differently depending on the field type:
-
-- exact matches for fields like `founding_year` / `website`
-- fuzzy matches for fields like `company_name` / `ceo`
-- embedding similarity for fields like `description`
-- checking within a certain tolerance (+/- 10%) for fields like `employee_count` / `total_funding_mm_usd`
-
-### Running evals
-
-Please see instructions on how to run evals [here](https://github.com/langchain-ai/agent-evals/tree/main/public_company_data_enrichment)
+Please see instructions on how to run evals [here](https://github.com/langchain-ai/agent-evals/tree/main/public_company_data_enrichment) and [here](https://github.com/langchain-ai/agent-evals/tree/main/startup_data_enrichment).
