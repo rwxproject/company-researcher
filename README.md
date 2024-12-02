@@ -18,7 +18,7 @@ $ cp .env.example .env
 * A schema (see below for details) is optional. It will use a default schema defined [here](https://github.com/langchain-ai/company_mAIstro/blob/main/company_maistro.py#L163) if none is provided.
 * Additional user notes about the company can be provided as a text field, and will be included in the research process. 
 
-<img width="1624" alt="Screenshot 2024-11-27 at 9 29 15 AM" src="https://github.com/user-attachments/assets/176f9959-504e-4f05-9381-bf72d526714c">
+<img width="1624" alt="studio" src="./docs/images/studio.png">      
 
 ## Overview
 
@@ -47,7 +47,7 @@ The configuration for Company mAIstro is defined in the `configuration.py` file:
 
 These can be added in Studio:
 
-<img width="1624" alt="Screenshot 2024-11-27 at 9 27 41 AM" src="https://github.com/user-attachments/assets/72908cf9-7779-4aaf-af60-46ca44db82b4">
+<img width="1624" alt="config" src="./docs/images/config.png">
 
 ## Inputs 
 
@@ -55,9 +55,11 @@ The user inputs are:
 
 ```
 * company: str - A company to research
-* schema: dict - A JSON schema for the output
+* schema: Optional[dict] - A JSON schema for the output
 * user_notes: Optional[str] - Any additional notes about the company from the user
 ```
+
+If a schema is not provided, the system will use a default schema (`DEFAULT_EXTRACTION_SCHEMA`) defined in `company_maistro.py`.
 
 ### Schemas  
 
