@@ -11,11 +11,10 @@ from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.runnables import RunnableConfig
 from langsmith import traceable
 
-from langgraph.constants import Send
 from langgraph.graph import START, END, StateGraph
 
 from pydantic import BaseModel, Field
-from typing_extensions import Annotated, Any, List, Optional, Literal
+from typing_extensions import Annotated, Any, Optional, Literal
 from dataclasses import dataclass, field
 
 import configuration
@@ -28,7 +27,7 @@ rate_limiter = InMemoryRateLimiter(
     check_every_n_seconds=0.1,
     max_bucket_size=10,  # Controls the maximum burst size.
 )
-claude_3_5_sonnet = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0, rate_limiter=rate_limiter)
+claude_3_5_sonnet = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, rate_limiter=rate_limiter)
 
 # -----------------------------------------------------------------------------
 # Search
@@ -37,47 +36,6 @@ tavily_async_client = AsyncTavilyClient()
 
 # -----------------------------------------------------------------------------
 # Utils
-@traceable
-async def tavily_search_async(search_queries, tavily_topic, tavily_days):
-    """
-    Performs concurrent web searches using the Tavily API.
-
-    Args:
-        search_queries (List[SearchQuery]): List of search queries to process
-        tavily_topic (str): Type of search to perform ('news' or 'general')
-        tavily_days (int): Number of days to look back for news articles (only used when tavily_topic='news')
-
-    Returns:
-        List[dict]: List of search results from Tavily API, one per query
-
-    Note:
-        For news searches, each result will include articles from the last `tavily_days` days.
-        For general searches, the time range is unrestricted.
-    """
-
-    search_tasks = []
-    for query in search_queries:
-        if tavily_topic == "news":
-            search_tasks.append(
-                tavily_async_client.search(
-                    query,
-                    max_results=5,
-                    include_raw_content=True,
-                    topic="news",
-                    days=tavily_days,
-                )
-            )
-        else:
-            search_tasks.append(
-                tavily_async_client.search(
-                    query, max_results=5, include_raw_content=True, topic="general"
-                )
-            )
-
-    # Execute all searches concurrently
-    search_docs = await asyncio.gather(*search_tasks)
-
-    return search_docs
 
 
 def deduplicate_and_format_sources(
@@ -155,12 +113,8 @@ Notes from research:
 
 # -----------------------------------------------------------------------------
 # Schema
-class SearchQuery(BaseModel):
-    search_query: str = Field(None, description="Query for web search.")
-
-
 class Queries(BaseModel):
-    queries: List[SearchQuery] = Field(
+    queries: list[str] = Field(
         description="List of search queries.",
     )
 
@@ -218,7 +172,7 @@ class OverallState:
     company: str
     "Company to research provided by the user."
 
-    extraction_schema:  dict[str, Any] = field(
+    extraction_schema: dict[str, Any] = field(
         default_factory=lambda: DEFAULT_EXTRACTION_SCHEMA
     )
     "The json schema defines the information the agent is tasked with filling out."
@@ -360,10 +314,10 @@ class ReflectionOutput(BaseModel):
     is_satisfactory: bool = Field(
         description="True if all required fields are well populated, False otherwise"
     )
-    missing_fields: List[str] = Field(
+    missing_fields: list[str] = Field(
         description="List of field names that are missing or incomplete"
     )
-    reflection_search_queries: List[str] = Field(
+    reflection_search_queries: list[str] = Field(
         description="If is_satisfactory is False, provide 1-3 targeted search queries to find the missing information"
     )
     reasoning: str = Field(
@@ -435,7 +389,7 @@ async def research_company(state: OverallState, config: RunnableConfig) -> str:
         )
 
         # Queries
-        query_list = [query.search_query for query in results.queries]
+        query_list = [query for query in results.queries]
 
     # Search tasks
     search_tasks = []
