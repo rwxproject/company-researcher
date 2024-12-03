@@ -109,7 +109,7 @@ async def research_company(state: OverallState, config: RunnableConfig) -> str:
                 {"role": "system", "content": query_instructions},
                 {
                     "role": "user",
-                    "content": f"Please generate a list of search queries related to the schema that you want to populate.",
+                    "content": "Please generate a list of search queries related to the schema that you want to populate.",
                 },
             ]
         )
@@ -164,7 +164,7 @@ def gather_notes_extract_schema(state: OverallState) -> dict[str, Any]:
             {"role": "system", "content": system_prompt},
             {
                 "role": "user",
-                "content": f"Produce a structured output from these notes.",
+                "content": "Produce a structured output from these notes.",
             },
         ]
     )
@@ -191,7 +191,7 @@ def reflection(state: OverallState, config: RunnableConfig) -> dict[str, Any]:
     result = structured_llm.invoke(
         [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"Produce a structured reflection output."},
+            {"role": "user", "content": "Produce a structured reflection output."},
         ]
     )
 
