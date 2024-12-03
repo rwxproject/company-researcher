@@ -1,17 +1,17 @@
 import os
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, fields
 from typing import Any, Optional
 
 from langchain_core.runnables import RunnableConfig
-from typing_extensions import Annotated
-from dataclasses import dataclass
+
 
 @dataclass(kw_only=True)
 class Configuration:
     """The configurable fields for the chatbot."""
-    max_search_queries: int = 3 # Max search queries per company
-    max_search_results: int = 3 # Max search results per query
-    max_reflection_steps: int = 0 # Max reflection steps
+
+    max_search_queries: int = 3  # Max search queries per company
+    max_search_results: int = 3  # Max search results per query
+    max_reflection_steps: int = 0  # Max reflection steps
 
     @classmethod
     def from_runnable_config(
