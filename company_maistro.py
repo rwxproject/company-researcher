@@ -217,9 +217,7 @@ class OutputState:
 # -----------------------------------------------------------------------------
 # Prompts
 
-extraction_prompt = """Your task is to take notes gather from web research
-
-and extract them into the following schema. 
+extraction_prompt = """Your task is to take notes gathered from web research and extract them into the following schema.
 
 <schema>
 {info}
@@ -230,7 +228,7 @@ Here are all the notes from research:
 <Web research notes>
 {notes}
 <Web research notes>
- """
+"""
 
 query_writer_instructions = """You are a search query generator tasked with creating targeted search queries to gather specific company information.
 
