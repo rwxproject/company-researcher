@@ -18,7 +18,7 @@ $ cp .env.example .env
 * A schema (see below for details) is optional. It will use a default schema defined [here](https://github.com/langchain-ai/company_mAIstro/blob/main/company_maistro.py#L163) if none is provided.
 * Additional user notes about the company can be provided as a text field, and will be included in the research process. 
 
-<img width="1624" alt="studio" src="./docs/images/studio.png">      
+<img width="1624" alt="studio" src="https://github.com/langchain-ai/company_mAIstro/blob/main/docs/images/studio.png?raw=true">
 
 ## Overview
 
@@ -47,7 +47,7 @@ The configuration for Company mAIstro is defined in the `configuration.py` file:
 
 These can be added in Studio:
 
-<img width="1624" alt="config" src="./docs/images/config.png">
+<img width="1624" alt="config" src="https://github.com/langchain-ai/company_mAIstro/blob/main/docs/images/config.png?raw=true">
 
 ## Inputs 
 
