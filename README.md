@@ -75,7 +75,7 @@ The user inputs are:
 * user_notes: Optional[str] - Any additional notes about the company from the user
 ```
 
-If a schema is not provided, the system will use a default schema (`DEFAULT_EXTRACTION_SCHEMA`) defined in `company_maistro.py`.
+If a schema is not provided, the system will use a default schema (`DEFAULT_EXTRACTION_SCHEMA`) defined in `src/agent/state.py`.
 
 ### Schemas  
 
