@@ -69,13 +69,6 @@ def evaluate_agent(outputs: dict, reference_outputs: dict):
     return score.score
 
 
-def get_agent_metadata(graph_id: str, agent_url: str):
-    if "marketplace" in agent_url:
-        project_id = agent_url.split("/")[-1]
-        return {"project_id": project_id, "graph_id": graph_id}
-    return {"graph_id": graph_id}
-
-
 # PUBLIC API
 
 
@@ -119,7 +112,6 @@ def run_eval(
         data=dataset,
         evaluators=[evaluate_agent],
         experiment_prefix=experiment_prefix,
-        metadata=get_agent_metadata(graph_id, agent_url),
     )
     return results
 
