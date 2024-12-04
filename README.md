@@ -279,6 +279,7 @@ And set your API key:
 
 ```shell
 export LANGSMITH_API_KEY=<your_langsmith_api_key>
+export ANTHROPIC_API_KEY=<your_anthropic_api_key>
 ```
 
 ### Evaluation metric
