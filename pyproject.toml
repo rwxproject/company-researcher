@@ -1,7 +1,7 @@
 [project]
 name = "company-researcher"
 version = "0.0.1"
-description = "Barebones template for a URL scraping agent with LangGraph."
+description = "Researcher agent that searches information about a company and returns it in a structured format."
 authors = [
     { name = "Vadym Barda" },
     { name = "Lance Martin" }
