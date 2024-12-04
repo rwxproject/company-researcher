@@ -16,11 +16,12 @@ Install dependencies:
 pip install -e .
 ```  
 
-Load API keys into the environment for the LangSmith SDK and Anthropic API:
+Load API keys into the environment for the [LangSmith](https://smith.langchain.com) SDK, [Anthropic API](https://console.anthropic.com/) and [Tavily API](https://tavily.com/):
 
 ```shell
 export LANGSMITH_API_KEY=<your_langsmith_api_key>
 export ANTHROPIC_API_KEY=<your_anthropic_api_key>
+export TAVILY_API_KEY=<your_tavily_api_key>
 ```
 
 Launch the agent:
