@@ -72,22 +72,27 @@ def generate_queries(state: OverallState, config: RunnableConfig) -> dict[str, A
     )
 
     # Generate queries
-    results = cast(Queries, structured_llm.invoke(
-        [
-            {"role": "system", "content": query_instructions},
-            {
-                "role": "user",
-                "content": "Please generate a list of search queries related to the schema that you want to populate.",
-            },
-        ]
-    ))
+    results = cast(
+        Queries,
+        structured_llm.invoke(
+            [
+                {"role": "system", "content": query_instructions},
+                {
+                    "role": "user",
+                    "content": "Please generate a list of search queries related to the schema that you want to populate.",
+                },
+            ]
+        ),
+    )
 
     # Queries
     query_list = [query for query in results.queries]
     return {"search_queries": query_list}
 
 
-async def research_company(state: OverallState, config: RunnableConfig) -> dict[str, Any]:
+async def research_company(
+    state: OverallState, config: RunnableConfig
+) -> dict[str, Any]:
     """Execute a multi-step web search and information extraction process.
 
     This function performs the following steps:
@@ -153,29 +158,26 @@ def gather_notes_extract_schema(state: OverallState) -> dict[str, Any]:
     return {"info": result}
 
 
-def reflection(state: OverallState, config: RunnableConfig) -> dict[str, Any]:
+def reflection(state: OverallState) -> dict[str, Any]:
     """Reflect on the extracted information and generate search queries to find missing information."""
-
-    # Get configuration
-    configurable = Configuration.from_runnable_config(config)
-
-    # Generate search queries
     structured_llm = claude_3_5_sonnet.with_structured_output(ReflectionOutput)
 
     # Format reflection prompt
     system_prompt = REFLECTION_PROMPT.format(
         schema=json.dumps(state.extraction_schema, indent=2),
         info=state.info,
-        max_search_queries=configurable.max_search_queries,
     )
 
     # Invoke
-    result = cast(ReflectionOutput, structured_llm.invoke(
-        [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": "Produce a structured reflection output."},
-        ]
-    ))
+    result = cast(
+        ReflectionOutput,
+        structured_llm.invoke(
+            [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": "Produce a structured reflection output."},
+            ]
+        ),
+    )
 
     if result.is_satisfactory:
         return {"is_satisfactory": result.is_satisfactory}

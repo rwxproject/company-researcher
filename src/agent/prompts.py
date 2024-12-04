@@ -79,10 +79,4 @@ Analyze if all required fields are present and sufficiently populated. Consider:
 1. Are any required fields missing?
 2. Are any fields incomplete or containing uncertain information?
 3. Are there fields with placeholder values or "unknown" markers?
-
-Return a structured response that has the following fields:
-- "is_satisfactory": boolean,  # True if all required fields are well populated, False otherwise
-- "missing_fields": [string],  # List of field names that are missing or incomplete
-- "reflection_search_queries": [string],  # If is_satisfactory is False, provide {max_search_queries} targeted search queries to find the missing information
-- "reasoning": string  # Brief explanation of your assessment
 """
