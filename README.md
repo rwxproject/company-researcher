@@ -45,7 +45,7 @@ If all is well, you should see the following output:
 Company Researcher Agent follows a multi-step research and extraction workflow that separates web research from schema extraction, allowing for better resource management and comprehensive data collection:
 
    - **Research Phase**: The system performs intelligent web research on the input company:
-     - Uses an LLM to generate targeted search queries based on the schema requirements (up to `max_search_queries` per company)
+     - Uses an LLM to generate targeted search queries based on the schema requirements (up to `max_search_queries`)
      - Executes concurrent web searches via [Tavily API](https://tavily.com/), retrieving up to `max_search_results` results per query
      - Takes structured research notes focused on schema-relevant information
    - **Extraction Phase**: After research is complete, the system:
