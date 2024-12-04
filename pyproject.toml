@@ -56,3 +56,8 @@ lint.ignore = [
 "tests/*" = ["D", "UP"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[dependency-groups]
+dev = [
+    "langgraph-cli[inmem]>=0.1.61",
+]
