@@ -1,4 +1,5 @@
 import asyncio
+from typing import cast, Any, Literal
 import json
 
 from tavily import AsyncTavilyClient
@@ -6,9 +7,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import START, END, StateGraph
-
 from pydantic import BaseModel, Field
-from typing_extensions import Any, Literal
 
 from agent.configuration import Configuration
 from agent.state import InputState, OutputState, OverallState
@@ -49,77 +48,60 @@ class ReflectionOutput(BaseModel):
     missing_fields: list[str] = Field(
         description="List of field names that are missing or incomplete"
     )
-    reflection_search_queries: list[str] = Field(
+    search_queries: list[str] = Field(
         description="If is_satisfactory is False, provide 1-3 targeted search queries to find the missing information"
     )
     reasoning: str = Field(description="Brief explanation of the assessment")
 
 
-async def research_company(state: OverallState, config: RunnableConfig) -> str:
-    """Execute a multi-step web search and information extraction process.
-
-    This function performs the following steps:
-    1. Generates multiple search queries based on the input query
-    2. Executes concurrent web searches using the Tavily API
-    3. Deduplicates and formats the search results
-    4. Extracts structured information based on the provided schema
-
-    Args:
-        query: The initial search query string
-        state: Injected application state containing the extraction schema
-        config: Runtime configuration for the search process
-
-    Returns:
-        str: Structured notes from the search results that are
-         relevant to the extraction schema in state.extraction_schema
-
-    Note:
-        The function uses concurrent execution for multiple search queries to improve
-        performance and combines results from various sources for comprehensive coverage.
-    """
-
+def generate_queries(state: OverallState, config: RunnableConfig) -> dict[str, Any]:
+    """Generate search queries based on the user input and extraction schema."""
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
     max_search_queries = configurable.max_search_queries
-    max_search_results = configurable.max_search_results
 
     # Generate search queries
     structured_llm = claude_3_5_sonnet.with_structured_output(Queries)
 
-    # Check reflection output - access attribute directly
-    reflection_output = getattr(state, "is_satisfactory", None)
-    reflection_queries = getattr(state, "reflection_search_queries", None)
+    # Format system instructions
+    query_instructions = QUERY_WRITER_PROMPT.format(
+        company=state.company,
+        info=json.dumps(state.extraction_schema, indent=2),
+        user_notes=state.user_notes,
+        max_search_queries=max_search_queries,
+    )
 
-    # If we have performed reflection and have new search queries
-    if reflection_output is not None and reflection_queries:
-        # Get generated search queries
-        query_list = reflection_queries
-    else:
-        # Format system instructions
-        query_instructions = QUERY_WRITER_PROMPT.format(
-            company=state.company,
-            info=json.dumps(state.extraction_schema, indent=2),
-            user_notes=state.user_notes,
-            max_search_queries=max_search_queries,
-        )
+    # Generate queries
+    results = cast(Queries, structured_llm.invoke(
+        [
+            {"role": "system", "content": query_instructions},
+            {
+                "role": "user",
+                "content": "Please generate a list of search queries related to the schema that you want to populate.",
+            },
+        ]
+    ))
 
-        # Generate queries
-        results = structured_llm.invoke(
-            [
-                {"role": "system", "content": query_instructions},
-                {
-                    "role": "user",
-                    "content": "Please generate a list of search queries related to the schema that you want to populate.",
-                },
-            ]
-        )
+    # Queries
+    query_list = [query for query in results.queries]
+    return {"search_queries": query_list}
 
-        # Queries
-        query_list = [query for query in results.queries]
+
+async def research_company(state: OverallState, config: RunnableConfig) -> dict[str, Any]:
+    """Execute a multi-step web search and information extraction process.
+
+    This function performs the following steps:
+    1. Executes concurrent web searches using the Tavily API
+    2. Deduplicates and formats the search results
+    """
+
+    # Get configuration
+    configurable = Configuration.from_runnable_config(config)
+    max_search_results = configurable.max_search_results
 
     # Search tasks
     search_tasks = []
-    for query in query_list:
+    for query in state.search_queries:
         search_tasks.append(
             tavily_async_client.search(
                 query,
@@ -188,19 +170,19 @@ def reflection(state: OverallState, config: RunnableConfig) -> dict[str, Any]:
     )
 
     # Invoke
-    result = structured_llm.invoke(
+    result = cast(ReflectionOutput, structured_llm.invoke(
         [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": "Produce a structured reflection output."},
         ]
-    )
+    ))
 
     if result.is_satisfactory:
         return {"is_satisfactory": result.is_satisfactory}
     else:
         return {
             "is_satisfactory": result.is_satisfactory,
-            "reflection_search_queries": result.reflection_search_queries,
+            "search_queries": result.search_queries,
             "reflection_steps_taken": state.reflection_steps_taken + 1,
         }
 
@@ -232,10 +214,12 @@ builder = StateGraph(
     config_schema=Configuration,
 )
 builder.add_node("gather_notes_extract_schema", gather_notes_extract_schema)
+builder.add_node("generate_queries", generate_queries)
 builder.add_node("research_company", research_company)
 builder.add_node("reflection", reflection)
 
-builder.add_edge(START, "research_company")
+builder.add_edge(START, "generate_queries")
+builder.add_edge("generate_queries", "research_company")
 builder.add_edge("research_company", "gather_notes_extract_schema")
 builder.add_edge("gather_notes_extract_schema", "reflection")
 builder.add_conditional_edges("reflection", route_from_reflection)
