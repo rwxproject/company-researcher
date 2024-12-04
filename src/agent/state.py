@@ -65,6 +65,9 @@ class OverallState:
     user_notes: str = field(default=None)
     "Any notes from the user to start the research process."
 
+    search_queries: list[str] = field(default=None)
+    "List of generated search queries to find relevant information"
+
     completed_notes: Annotated[list, operator.add] = field(default_factory=list)
     "Notes from completed research related to the schema"
 
@@ -77,9 +80,6 @@ class OverallState:
 
     is_satisfactory: bool = field(default=None)
     "True if all required fields are well populated, False otherwise"
-
-    reflection_search_queries: list[str] = field(default=None)
-    "If is_satisfactory is False, provide targeted search queries to find the missing information"
 
     reflection_steps_taken: int = field(default=0)
     "Number of times the reflection node has been executed"
