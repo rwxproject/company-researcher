@@ -71,7 +71,7 @@ The user inputs are:
 
 ```
 * company: str - A company to research
-* schema: Optional[dict] - A JSON schema for the output
+* extraction_schema: Optional[dict] - A JSON schema for the output
 * user_notes: Optional[str] - Any additional notes about the company from the user
 ```
 
