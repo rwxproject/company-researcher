@@ -1,8 +1,11 @@
+import ast
 import asyncio
-from typing import cast, Any, Literal
+from typing import cast, Any, Literal, Optional, Annotated
 import json
+from langchain_core.tools import InjectedToolArg
 
-from tavily import AsyncTavilyClient
+from langchain_community.tools.bing_search import BingSearchResults
+from langchain_community.utilities import BingSearchAPIWrapper
 from langchain_anthropic import ChatAnthropic
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.runnables import RunnableConfig
@@ -19,27 +22,20 @@ from agent.prompts import (
     QUERY_WRITER_PROMPT,
 )
 
-# LLMs
-
+# Initialize LLM with rate limiting
 rate_limiter = InMemoryRateLimiter(
     requests_per_second=4,
     check_every_n_seconds=0.1,
-    max_bucket_size=10,  # Controls the maximum burst size.
+    max_bucket_size=10,
 )
 claude_3_5_sonnet = ChatAnthropic(
     model="claude-3-5-sonnet-latest", temperature=0, rate_limiter=rate_limiter
 )
 
-# Search
-
-tavily_async_client = AsyncTavilyClient()
-
-
 class Queries(BaseModel):
     queries: list[str] = Field(
         description="List of search queries.",
     )
-
 
 class ReflectionOutput(BaseModel):
     is_satisfactory: bool = Field(
@@ -53,25 +49,34 @@ class ReflectionOutput(BaseModel):
     )
     reasoning: str = Field(description="Brief explanation of the assessment")
 
+async def search(
+    query: str, *, config: Annotated[RunnableConfig, InjectedToolArg]
+) -> Optional[list[dict[str, Any]]]:
+    """Query Bing search engine.
+    
+    Returns comprehensive, accurate, and trusted results from the web.
+    Particularly useful for current events and company information.
+    """
+    configuration = Configuration.from_runnable_config(config)
+    api_wrapper = BingSearchAPIWrapper(
+        k=configuration.max_search_results
+    )
+    wrapped = BingSearchResults(api_wrapper=api_wrapper)
+    result = await wrapped.ainvoke({"query": query})
+    return cast(list[dict[str, Any]], result)
 
 def generate_queries(state: OverallState, config: RunnableConfig) -> dict[str, Any]:
-    """Generate search queries based on the user input and extraction schema."""
-    # Get configuration
+    """Generate targeted search queries based on the input and extraction schema."""
     configurable = Configuration.from_runnable_config(config)
-    max_search_queries = configurable.max_search_queries
-
-    # Generate search queries
     structured_llm = claude_3_5_sonnet.with_structured_output(Queries)
 
-    # Format system instructions
     query_instructions = QUERY_WRITER_PROMPT.format(
         company=state.company,
         info=json.dumps(state.extraction_schema, indent=2),
         user_notes=state.user_notes,
-        max_search_queries=max_search_queries,
+        max_search_queries=configurable.max_search_queries,
     )
 
-    # Generate queries
     results = cast(
         Queries,
         structured_llm.invoke(
@@ -85,90 +90,80 @@ def generate_queries(state: OverallState, config: RunnableConfig) -> dict[str, A
         ),
     )
 
-    # Queries
-    query_list = [query for query in results.queries]
-    return {"search_queries": query_list}
-
+    return {"search_queries": results.queries}
 
 async def research_company(
     state: OverallState, config: RunnableConfig
 ) -> dict[str, Any]:
-    """Execute a multi-step web search and information extraction process.
-
-    This function performs the following steps:
-    1. Executes concurrent web searches using the Tavily API
-    2. Deduplicates and formats the search results
-    """
-
-    # Get configuration
-    configurable = Configuration.from_runnable_config(config)
-    max_search_results = configurable.max_search_results
-
-    # Search tasks
-    search_tasks = []
-    for query in state.search_queries:
-        search_tasks.append(
-            tavily_async_client.search(
-                query,
-                max_results=max_search_results,
-                include_raw_content=True,
-                topic="general",
-            )
+    """Execute multi-step web search and information extraction process."""
+    # Execute parallel search queries
+    search_tasks = [search(query, config=config) for query in state.search_queries]
+    search_results = await asyncio.gather(*search_tasks)
+    
+    formatted_docs = []
+    for results in search_results:
+        if not results:
+            continue
+            
+        # Parse string results if needed
+        parsed_results = (
+            ast.literal_eval(results) if isinstance(results, str) 
+            else results
         )
+        
+        # Process results list
+        if isinstance(parsed_results, list):
+            formatted_docs.extend([
+                {
+                    "url": result.get("link", "Unknown source"),
+                    "content": result.get("snippet", ""),
+                    "title": result.get("title", "Search Result")
+                }
+                for result in parsed_results
+                if isinstance(result, dict)
+            ])
 
-    # Execute all searches concurrently
-    search_docs = await asyncio.gather(*search_tasks)
-
-    # Deduplicate and format sources
+    # Process and format sources
     source_str = deduplicate_and_format_sources(
-        search_docs, max_tokens_per_source=1000, include_raw_content=True
+        formatted_docs, max_tokens_per_source=1000
     )
 
-    # Generate structured notes relevant to the extraction schema
-    p = INFO_PROMPT.format(
+    # Generate structured notes
+    prompt = INFO_PROMPT.format(
         info=json.dumps(state.extraction_schema, indent=2),
         content=source_str,
         company=state.company,
         user_notes=state.user_notes,
     )
-    result = await claude_3_5_sonnet.ainvoke(p)
+    result = await claude_3_5_sonnet.ainvoke(prompt)
     return {"completed_notes": [str(result.content)]}
 
-
 def gather_notes_extract_schema(state: OverallState) -> dict[str, Any]:
-    """Gather notes from the web search and extract the schema fields."""
-
-    # Format all notes
+    """Extract structured information from research notes."""
     notes = format_all_notes(state.completed_notes)
-
-    # Extract schema fields
     system_prompt = EXTRACTION_PROMPT.format(
-        info=json.dumps(state.extraction_schema, indent=2), notes=notes
+        info=json.dumps(state.extraction_schema, indent=2), 
+        notes=notes
     )
+    
     structured_llm = claude_3_5_sonnet.with_structured_output(state.extraction_schema)
     result = structured_llm.invoke(
         [
             {"role": "system", "content": system_prompt},
-            {
-                "role": "user",
-                "content": "Produce a structured output from these notes.",
-            },
+            {"role": "user", "content": "Produce a structured output from these notes."},
         ]
     )
     return {"info": result}
 
-
 def reflection(state: OverallState) -> dict[str, Any]:
-    """Reflect on the extracted information and generate search queries to find missing information."""
+    """Reflect on extracted information and determine next steps."""
     structured_llm = claude_3_5_sonnet.with_structured_output(ReflectionOutput)
 
-    # Format reflection prompt
     system_prompt = REFLECTION_PROMPT.format(
         schema=json.dumps(state.extraction_schema, indent=2),
         info=state.info,
     )
 
-    # Invoke
     result = cast(
         ReflectionOutput,
         structured_llm.invoke(
@@ -181,50 +176,46 @@ def reflection(state: OverallState) -> dict[str, Any]:
 
     if result.is_satisfactory:
         return {"is_satisfactory": result.is_satisfactory}
-    else:
-        return {
-            "is_satisfactory": result.is_satisfactory,
-            "search_queries": result.search_queries,
-            "reflection_steps_taken": state.reflection_steps_taken + 1,
-        }
-
+    
+    return {
+        "is_satisfactory": result.is_satisfactory,
+        "search_queries": result.search_queries,
+        "reflection_steps_taken": state.reflection_steps_taken + 1,
+    }
 
 def route_from_reflection(
     state: OverallState, config: RunnableConfig
-) -> Literal[END, "research_company"]:  # type: ignore
-    """Route the graph based on the reflection output."""
-    # Get configuration
+) -> Literal[END, "research_company"]:
+    """Determine next step based on reflection results."""
     configurable = Configuration.from_runnable_config(config)
 
-    # If we have satisfactory results, end the process
     if state.is_satisfactory:
         return END
 
-    # If results aren't satisfactory but we haven't hit max steps, continue research
     if state.reflection_steps_taken <= configurable.max_reflection_steps:
         return "research_company"
 
-    # If we've exceeded max steps, end even if not satisfactory
     return END
 
-
-# Add nodes and edges
+# Build and compile graph
 builder = StateGraph(
     OverallState,
     input=InputState,
     output=OutputState,
     config_schema=Configuration,
 )
+
 builder.add_node("gather_notes_extract_schema", gather_notes_extract_schema)
 builder.add_node("generate_queries", generate_queries)
 builder.add_node("research_company", research_company)
 builder.add_node("reflection", reflection)
 
+# Define graph flow
 builder.add_edge(START, "generate_queries")
 builder.add_edge("generate_queries", "research_company")
 builder.add_edge("research_company", "gather_notes_extract_schema")
 builder.add_edge("gather_notes_extract_schema", "reflection")
 builder.add_conditional_edges("reflection", route_from_reflection)
 
-# Compile
+# Compile graph
 graph = builder.compile()
