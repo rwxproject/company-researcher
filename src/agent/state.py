@@ -2,37 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Optional, Annotated
 import operator
 
-
-DEFAULT_EXTRACTION_SCHEMA = {
-    "title": "CompanyInfo",
-    "description": "Basic information about a company",
-    "type": "object",
-    "properties": {
-        "company_name": {
-            "type": "string",
-            "description": "Official name of the company",
-        },
-        "founding_year": {
-            "type": "integer",
-            "description": "Year the company was founded",
-        },
-        "founder_names": {
-            "type": "array",
-            "items": {"type": "string"},
-            "description": "Names of the founding team members",
-        },
-        "product_description": {
-            "type": "string",
-            "description": "Brief description of the company's main product or service",
-        },
-        "funding_summary": {
-            "type": "string",
-            "description": "Summary of the company's funding history",
-        },
-    },
-    "required": ["company_name"],
-}
-
+from agent.schema import DEFAULT_EXTRACTION_SCHEMA
 
 @dataclass(kw_only=True)
 class InputState:

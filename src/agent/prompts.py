@@ -31,6 +31,7 @@ Your query should:
 3. Prioritize finding information that matches the schema requirements
 4. Include the company name and relevant business terms
 5. Be specific enough to avoid irrelevant results
+6. Remember to include in your response all sources website and url used to generate the report
 
 Create a focused query that will maximize the chances of finding schema-relevant information."""
 
@@ -59,6 +60,7 @@ Please provide detailed research notes that:
 3. Include specific facts, dates, and figures when available
 4. Maintain accuracy of the original content
 5. Note when important information appears to be missing or unclear
+6. Remember to include in your response all sources website and url used to generate the report
 
 Remember: Don't try to format the output to match the schema - just take clear notes that capture all relevant information."""
 
